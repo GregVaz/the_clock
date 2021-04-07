@@ -56,6 +56,11 @@ group :development do
   gem "rubocop"
   gem "rubocop-rails", require: false
   gem "rubocop-rspec"
+  # Capistrano gems
+  gem "capistrano", "~> 3.10", require: false
+  gem "capistrano-rails", "~> 1.6", require: false
+  gem 'capistrano-rbenv',           '2.1.4 '
+  gem 'capistrano-passenger',       '0.2.0'
 end
 
 group :test do

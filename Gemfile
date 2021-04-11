@@ -36,6 +36,8 @@ gem 'dotenv-rails', groups: [:development, :test]
 gem 'bootsnap', '>= 1.4.4', require: false
 # Install React
 gem 'react-rails'
+# Install Haml
+gem 'haml', '~> 5.2', '>= 5.2.1'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

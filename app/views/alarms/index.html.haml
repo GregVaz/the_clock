@@ -1,0 +1,15 @@
+%h1 Alarms
+= link_to "New Alarm", new_alarm_path, class: "btn btn-primary"
+%hr
+%h3 All my alarms
+.d-flex.justify-content-around
+  - @alarms.each do |alarm|
+    .card{style: "width: 18rem;"}
+      .card-body
+        %h5.card-title Label: #{alarm.label}
+        %h6 Time: #{alarm.display_time}
+        %h6 Days: #{alarm.days.join(', ')}
+        .d-flex.justify-content-around
+          = button_to 'Remove alarm', alarm_path(alarm), method: :delete, class: "btn btn-danger btn-sm"
+          = button_to 'Update alarm', edit_alarm_path(alarm), method: :get, class: "btn btn-info btn-sm"
+= link_to 'Back to Home', root_path

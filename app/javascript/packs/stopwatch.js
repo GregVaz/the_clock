@@ -1,22 +1,23 @@
 import Rails from "@rails/ujs"
 const startBtn = document.getElementById("start");
 const resetBtn = document.getElementById("reset");
-const recordBtn = document.getElementById("record");
+const saveLapBtn = document.getElementById("save-lap-btn");
+const saveStopwatchBtn = document.getElementById("save-stopwatch-btn");
 const hoursLabel = document.getElementById("hours");
 const minutesLabel = document.getElementById("minutes");
 const secondsLabel = document.getElementById("seconds");
-const listRecords = document.getElementById("records");
 const labelInput = document.querySelector('input[name="label"]');
-const userId = recordBtn.dataset.userId;
+const panelLaps = document.getElementById("show-laps");
+const userId = saveLapBtn.dataset.userId;
 let totalTimeSeconds = 0;
 let interval;
 let difference = 0;
 let savedTime = 0;
-let previous_time = 0;
+let previousTime = 0;
 let paused = false;
 let running = false;
-let records = [];
 let stopwatchId = '';
+let laps = [];
 
 function startTimer() {
   interval = setInterval(showTime, 1000);
@@ -34,10 +35,10 @@ function stopTimer() {
 
 startBtn.addEventListener('click', () => {
   if (!running) {
-          startTimer();
-          startBtn.innerText = 'Pause';
+    startTimer();
+    startBtn.innerText = 'Pause';
   } else {
-         stopTimer(); 
+    stopTimer(); 
   }
 });
 
@@ -46,56 +47,52 @@ resetBtn.addEventListener('click', () => {
   clearInterval(interval);
   totalTimeSeconds = 0;
   difference = 0;
-  previous_time = 0;
+  previousTime = 0;
   savedTime = 0;
   hoursLabel.innerText = "00";
   minutesLabel.innerText = "00";
   secondsLabel.innerText = "00";
-  records = [];
+  laps = [];
   paused = false;
   running = false;
   labelInput.value = "";
+  panelLaps.innerHTML = '';
 });
 
 
-recordBtn.addEventListener('click', () => {
+saveLapBtn.addEventListener('click', () => {
+  if (running) {
+    difference = totalTimeSeconds - previousTime;
+    previousTime = totalTimeSeconds;
+    laps.push({time: previousTime, difference: difference});
+    let lapContainer = document.createElement("span");
+    lapContainer.innerText = `Duration: ${previousTime} - Difference: ${difference}`;
+    panelLaps.appendChild(lapContainer);
+  } else {
+    alert("Stopwatch is not running"); 
+  }
+});
+
+saveStopwatchBtn.addEventListener('click', () => {
   if(!labelInput.value) {
     alert("Label is empty");
-  } else if(!running) {
-    alert("No time running");
+  } else if(previousTime === 0) {
+    alert("There is no records");
   }else {
-    difference = totalTimeSeconds - previous_time;
-    if(previous_time === 0) {
-      saveRecordOfStopwatch();
-    } else {
-      saveLapOfStopwatch();
-    }
-    previous_time = totalTimeSeconds;
+    saveRecordOfStopwatch();
   }
 });
 
 function saveRecordOfStopwatch() {
   fetch(`/users/${userId}/stopwatches`, {
     method: 'POST',
-    body: JSON.stringify({label: labelInput.value, time: totalTimeSeconds, difference: difference}),
+    body: JSON.stringify({label: labelInput.value, laps: laps}),
     headers: {
       'Content-Type': 'application/json',
       'X-CSRF-Token': Rails.csrfToken()
     },
     credentials: 'same-origin'
-  }).then(response => response.json())
-  .then(result => stopwatchId = result.id);
-}
-
-function saveLapOfStopwatch() { 
-  fetch(`/users/${userId}/stopwatches/${stopwatchId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({time: totalTimeSeconds, difference: difference}),
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': Rails.csrfToken()
-    }
-  });
+  }).then(response => window.location.href = response.url);
 }
 
 function showTime() {

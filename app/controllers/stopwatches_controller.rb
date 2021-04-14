@@ -4,7 +4,6 @@ class StopwatchesController < ApplicationController
     @stopwatches = current_user.stopwatches
     respond_to do |format|
       format.html
-      format.json { render json: @stopwatch }
     end
   end
 
@@ -15,9 +14,10 @@ class StopwatchesController < ApplicationController
   def create
     @stopwatch = current_user.stopwatches.create(stopwatch_params)
     if @stopwatch.valid?
-      @stopwatch.laps.create(stopwatch_lap_params)
-      flash[:success] = 'Stopwatch created successfully, starting to record laps'
-      render json: @stopwatch
+      params[:laps].each do |lap|
+        @stopwatch.laps.create(lap.permit(:time, :difference))
+      end
+      flash[:success] = 'Stopwatch created successfully'
     else
       shows_errors(@stopwatch.errors)
       redirect_to user_stopwatches_path(current_user)

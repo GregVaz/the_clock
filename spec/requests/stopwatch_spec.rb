@@ -34,15 +34,18 @@ RSpec.describe "Stopwatches", type: :request do
     end
 
     context 'with valid attributes' do
+      before(:each) do
+        @laps = Array.new(3){ attributes_for(:lap) }
+      end
       it "saves the stopwatch in the database" do
         expect{
-          post user_stopwatches_path(user), params: {stopwatch: attributes_for(:stopwatch)}
+          post user_stopwatches_path(user), params: {stopwatch: attributes_for(:stopwatch), laps: @laps}
         }.to change(Stopwatch, :count).by(1)
       end
 
       it "renders json @stopwatch" do
-        post user_stopwatches_path(user), params: {stopwatch: attributes_for(:stopwatch)}
-        expect(response.content_type).to eq 'application/json; charset=utf-8'
+        post user_stopwatches_path(user), params: {stopwatch: attributes_for(:stopwatch), laps: @laps}
+        expect(response).to have_http_status(:success)
       end
     end
 

@@ -22,8 +22,7 @@ RSpec.feature "Stopwatches", type: :feature, js: true do
     sleep(3)
     click_button 'Start'
     sleep(3)
-    click_button 'Save lap'
-    visit current_path
+    click_button 'Save Stopwatch'
     expect(page).to have_content "Label: #{stopwatch[:label]}"
   end
 
@@ -37,8 +36,7 @@ RSpec.feature "Stopwatches", type: :feature, js: true do
     sleep(5)
     click_button 'Save lap'
     sleep(3)
-    click_button 'Save lap'
-    visit current_path 
+    click_button 'Save Stopwatch'
     expect(page).to have_content "Label: #{stopwatch[:label]}"
 
     click_button 'Remove'
@@ -60,7 +58,7 @@ RSpec.feature "Stopwatches", type: :feature, js: true do
       sleep(3)
       click_button 'Save lap'
     end
-    visit current_path
+    click_button 'Save Stopwatch'
     click_button 'Show laps'
     lap = Stopwatch.find(1).laps.first
     expect(page).to have_content 'Stopwatch record'
